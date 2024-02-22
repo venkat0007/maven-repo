@@ -23,7 +23,7 @@ pipeline {
            steps {
                 script {
 
-                        sh 'docker build -t backend:1 .'
+                        sh 'docker build -t backend-api:1 .'
                     }
                 }
            
@@ -36,8 +36,8 @@ pipeline {
                     
 
                         sh '''
-                            docker tag backend:1 venkat0007/backend:1
-			    docker push venkat0007/backend:1
+                            docker tag backend-api:1 venkat0007/backend-api:1
+			    docker push venkat0007/backend-api:1
                         '''
                     }
                 }
