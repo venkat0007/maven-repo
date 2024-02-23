@@ -1,6 +1,7 @@
 pipeline {
     agent any
-
+     parameters {
+        string(name: 'tag', defaultValue: '1', description: 'tagname')
     stages {
         stage('Clone repository') {
             steps {
