@@ -1,8 +1,8 @@
 pipeline {
     agent any
-     parameters {
+    parameters {
         string(name: 'tag', defaultValue: 'new', description: 'tagname')
-	}
+    }
     stages {
         stage('Clone repository') {
             steps {
@@ -14,37 +14,29 @@ pipeline {
                     def branchName = 'main'
 
                     // Checkout the repository with the specified branch
-                    checkout([$class: 'GitSCM', 
+                    checkout([$class: 'GitSCM',
                               branches: [[name: "refs/heads/${branchName}"]],
                               userRemoteConfigs: [[url: repoUrl]]])
                 }
             }
         }
-       stage("building an image")
-       {
-           steps {
+        stage("building an image") {
+            steps {
                 script {
-
-                        sh 'docker build -t backend:"${params.tag}" .'
-                    }
+                    sh "docker build -t backend:${params.tag} ."
                 }
-           
-           }
-	   
-    stage("pushing the image to dockerhub")
-       {
-           steps {
+            }
+        }
+        stage("pushing the image to dockerhub") {
+            steps {
                 script {
-                    
-
-                        sh '''
-                            docker tag backend-api:param:tag venkat0007/backend-api:"${params.tag}"
-			    docker push venkat0007/backend-api:"${params.tag}"
-                        '''
-                    }
+                    sh """
+                        docker tag backend:latest venkat0007/backend-api:${params.tag}
+                        docker push venkat0007/backend-api:${params.tag}
+                    """
                 }
-           }
-	   }
+            }
+        }
+    }
+}
 
-       }
-    
