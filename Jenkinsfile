@@ -26,7 +26,7 @@ pipeline {
 <<<<<<< HEAD
                         sh 'docker build -t backend$tag .'
 =======
-                        sh 'docker build -t backend-api:1 .'
+                        sh 'docker build -t backend-api$tag .'
 >>>>>>> 9cae32eb80d66adc9d3ee04c0d5737e98f33e021
                     }
                 }
