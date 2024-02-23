@@ -23,7 +23,11 @@ pipeline {
            steps {
                 script {
 
+<<<<<<< HEAD
                         sh 'docker build -t backend$tag .'
+=======
+                        sh 'docker build -t backend-api:1 .'
+>>>>>>> 9cae32eb80d66adc9d3ee04c0d5737e98f33e021
                     }
                 }
            
@@ -36,8 +40,13 @@ pipeline {
                     
 
                         sh '''
+<<<<<<< HEAD
                             docker tag backend:1 venkat0007/backend$tag
 			    docker push venkat0007/backend$tag
+=======
+                            docker tag backend-api:1 venkat0007/backend-api:1
+			    docker push venkat0007/backend-api:1
+>>>>>>> 9cae32eb80d66adc9d3ee04c0d5737e98f33e021
                         '''
                     }
                 }
