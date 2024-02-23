@@ -23,7 +23,7 @@ pipeline {
         stage("building an image") {
             steps {
                 script {
-                    sh "docker build -t backend:${params.tag} ."
+                    sh "docker build -t backend-api:${params.tag} ."
                 }
             }
         }
