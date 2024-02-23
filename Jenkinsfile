@@ -23,7 +23,9 @@ pipeline {
            steps {
                 script {
 
-                        sh 'docker build -t backend:${params.tag} .'
+                        sh '''printf ${params.tag}
+			docker build -t backend:${params.tag} .
+			'''
                     }
                 }
            
