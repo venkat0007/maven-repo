@@ -23,9 +23,7 @@ pipeline {
            steps {
                 script {
 
-                        sh '''printf ${params.tag}
-			docker build -t backend:${params.tag} .
-			'''
+                        sh 'docker build -t backend:params.tag .'
                     }
                 }
            
@@ -38,8 +36,8 @@ pipeline {
                     
 
                         sh '''
-                            docker tag backend-api:${param:tag} venkat0007/backend-api:${param.tag}
-			    docker push venkat0007/backend-api:${params.tag}
+                            docker tag backend-api:param:tag venkat0007/backend-api:param.tag
+			    docker push venkat0007/backend-api:params.tag
                         '''
                     }
                 }
