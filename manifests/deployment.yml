@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: venkatmavenrepo 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: venkatmavenrepo
+  template:
+    metadata:
+      labels:
+        app: venkatmavenrepo 
+    spec:
+      containers:
+        - name: venkatmavenrepo 
+          image: mavenbackend.azurecr.io/venkatmavenrepo
+          ports:
+          - containerPort: 8080
