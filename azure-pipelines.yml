@@ -13,8 +13,7 @@ variables:
   dockerRegistryServiceConnection: 'e7ce1367-0390-4508-83db-57c4fff2e7bb'
   imageRepository: 'venkatmavenrepo'
   containerRegistry: 'javaapplication.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: '$(Build.BuildId)'
+
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -37,3 +36,14 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+    - task: KubernetesManifest@1
+      inputs:
+        action: 'deploy'
+        connectionType: 'azureResourceManager'
+        azureSubscriptionConnection: 'Venkat-subscription(2)(1bbb4b4e-65ec-4a38-a43c-b60ac9808b60)'
+        azureResourceGroup: 'frontend-pipeline'
+        kubernetesCluster: 'java-application'
+        useClusterAdmin: true
+        namespace: 'app'
+        dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+        tag: '$(Build.BuildId)'
