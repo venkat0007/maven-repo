@@ -45,5 +45,5 @@ stages:
         kubernetesCluster: 'java-application'
         useClusterAdmin: true
         namespace: 'app'
-        dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+        dockerfilePath: 'Dockerfile'
         tag: '$(Build.BuildId)'
