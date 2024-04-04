@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: venkatmavenrepo 
-          image: mavenbackend.azurecr.io/venkatmavenrepo
+          image: mavenbackend.azurecr.io/venkatmavenrepo:27
           ports:
           - containerPort: 8080
