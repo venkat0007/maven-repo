@@ -5,6 +5,9 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
+  volumes:
+  - name: docker-graph-storage
+    emptyDir: {}
   containers:
   - name: docker
     image: docker:24.0.7
@@ -21,8 +24,11 @@ spec:
       privileged: true
     env:
     - name: DOCKER_TLS_CERTDIR
-      value: ""                # disable TLS
+      value: ""                     # disable TLS so 2375 works
     args: ["--host=tcp://0.0.0.0:2375"]
+    volumeMounts:
+    - name: docker-graph-storage
+      mountPath: /var/lib/docker
     ports:
     - containerPort: 2375
       name: dockerd
@@ -50,9 +56,15 @@ spec:
             steps {
                 container('docker') {
                     script {
+                        // Debug: check connection to DinD
                         sh "echo DOCKER_HOST=\$DOCKER_HOST"
-                        sh "nc -zv localhost 2375 || true"
+                        sh "ps -ef | grep dockerd || true"
+                        sh "curl -s http://localhost:2375/version || true"
+
+                        // Check docker client and daemon
                         sh "docker version"
+
+                        // Build image
                         sh "docker build -t backend-api:${params.tag} ."
                     }
                 }
@@ -62,6 +74,7 @@ spec:
             steps {
                 container('docker') {
                     script {
+                        // Add docker login here if needed
                         sh """
                             docker tag backend-api:${params.tag} venkat0007/backend-api:${params.tag}
                             docker push venkat0007/backend-api:${params.tag}
