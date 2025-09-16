@@ -6,20 +6,11 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: terraform
-    image: cedricguadalupe/terraform-gcloud
-    command:
-    - cat
-    tty: true
-    securityContext:
-      runAsUser: 0
   - name: docker
     image: docker:dind
     command:
     - cat
     tty: true
-    securityContext:
-      runAsUser: 0
 """
         }
     }
