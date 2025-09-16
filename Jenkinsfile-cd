@@ -7,7 +7,7 @@ kind: Pod
 spec:
   containers:
   - name: gcloud
-    image: google/cloud-sdk:slim   # Includes gcloud + kubectl
+    image: google/cloud-sdk:latest   # Includes gcloud + kubectl
     command: ["cat"]
     tty: true
   """
