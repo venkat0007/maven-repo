@@ -36,10 +36,11 @@ spec:
                         withCredentials([string(credentialsId: 'gcp-sa-key', variable: 'GCP_KEY_JSON')]) {
                             writeFile file: 'creds.json', text: "${GCP_KEY_JSON}"
                             sh """
+                               gcloud components install kubectl
                                 gcloud auth activate-service-account --key-file=creds.json
                                 gcloud config set project test-468900
                                 gcloud container clusters get-credentials cluster-1 \
-                                    --zone us-central1 --project test-468900
+                                    --zone us-central1-a --project test-468900
                             """
                         }
                     }
