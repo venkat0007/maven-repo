@@ -1,0 +1,63 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: gcloud
+    image: google/cloud-sdk:slim   # Includes gcloud + kubectl
+    command: ["cat"]
+    tty: true
+  """
+        }
+    }
+    stages {
+        stage('Clone repository') {
+            steps {
+                container('gcloud') {
+                    script {
+                        def repoUrl = 'https://github.com/venkat0007/maven-repo.git'
+                        def branchName = 'main'
+                        checkout([$class: 'GitSCM',
+                                  branches: [[name: "refs/heads/${branchName}"]],
+                                  userRemoteConfigs: [[url: repoUrl]]])
+                    }
+                }
+            }
+        }
+
+        stage('Authenticate with GCP') {
+            steps {
+                container('gcloud') {
+                    script {
+                        // Replace with Jenkins secret ID for your GCP service account JSON
+                        withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                            sh """
+                                gcloud auth activate-service-account --key-file=\$GOOGLE_APPLICATION_CREDENTIALS
+                                gcloud config set project YOUR_PROJECT_ID
+                                gcloud container clusters get-credentials enable-customer-01-ops-cluster \
+                                    --zone us-central1 --project YOUR_PROJECT_ID
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Deploy to GKE") {
+            steps {
+                container('gcloud') {
+                    script {
+                        // Example: apply manifests from repo
+                        sh """
+                            kubectl apply -f deployment.yaml
+                            kubectl apply -f service.yaml
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
