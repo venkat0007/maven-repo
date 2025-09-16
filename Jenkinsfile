@@ -60,7 +60,7 @@ spec:
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                                 docker tag backend-api:${params.tag} venkat12/backend-api:${params.tag}
-                                docker push venkat0007/backend-api:${params.tag}
+                                docker push venkat12/backend-api:${params.tag}
                             """
                         }
                     }
