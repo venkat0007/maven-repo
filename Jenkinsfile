@@ -8,8 +8,7 @@ spec:
   containers:
   - name: docker
     image: docker:24.0.7
-    command:
-    - cat
+    command: ["cat"]
     tty: true
     securityContext:
       privileged: true
@@ -20,7 +19,10 @@ spec:
     image: docker:24.0.7-dind
     securityContext:
       privileged: true
-    args: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
+    env:
+    - name: DOCKER_TLS_CERTDIR
+      value: ""                # disable TLS
+    args: ["--host=tcp://0.0.0.0:2375"]
     ports:
     - containerPort: 2375
       name: dockerd
@@ -48,6 +50,8 @@ spec:
             steps {
                 container('docker') {
                     script {
+                        sh "echo DOCKER_HOST=\$DOCKER_HOST"
+                        sh "nc -zv localhost 2375 || true"
                         sh "docker version"
                         sh "docker build -t backend-api:${params.tag} ."
                     }
