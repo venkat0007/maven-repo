@@ -21,6 +21,9 @@ spec:
     securityContext:
       privileged: true
     args: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
+    ports:
+    - containerPort: 2375
+      name: dockerd
   """
         }
     }
@@ -45,6 +48,7 @@ spec:
             steps {
                 container('docker') {
                     script {
+                        sh "docker version"
                         sh "docker build -t backend-api:${params.tag} ."
                     }
                 }
