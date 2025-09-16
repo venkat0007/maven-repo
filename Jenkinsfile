@@ -1,4 +1,3 @@
-// Use only the docker:dind image as your pod's container
 pipeline {
     agent {
         kubernetes {
@@ -8,19 +7,21 @@ kind: Pod
 spec:
   containers:
   - name: docker
-    image: docker:24.0.7-dind
+    image: docker:24.0.7
     command:
-    - dockerd-entrypoint.sh
-    args:
-    - --host=tcp://0.0.0.0:2375
-    - --host=unix:///var/run/docker.sock
+    - cat
     tty: true
     securityContext:
       privileged: true
     env:
     - name: DOCKER_HOST
       value: tcp://localhost:2375
-"""
+  - name: dind
+    image: docker:24.0.7-dind
+    securityContext:
+      privileged: true
+    args: ["--host=tcp://0.0.0.0:2375"]
+  """
         }
     }
     parameters {
