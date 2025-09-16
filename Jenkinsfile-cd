@@ -35,10 +35,11 @@ spec:
                         // Replace with Jenkins secret ID for your GCP service account JSON
                         withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                             sh """
-                                gcloud auth activate-service-account --key-file=\$GOOGLE_APPLICATION_CREDENTIALS
-                                gcloud config set project YOUR_PROJECT_ID
-                                gcloud container clusters get-credentials enable-customer-01-ops-cluster \
-                                    --zone us-central1 --project YOUR_PROJECT_ID
+                                echo $gcp-sa-key > creds.json
+                                gcloud auth activate-service-account --key-file=creds.json
+                                gcloud config set project test-468900
+                                gcloud container clusters get-credentials cluster-1 \
+                                    --zone us-central1 --project test-468900
                             """
                         }
                     }
