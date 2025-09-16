@@ -7,10 +7,26 @@ kind: Pod
 spec:
   containers:
   - name: docker
-    image: docker:dind
+    image: docker:24.0.7
     command:
     - cat
     tty: true
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  - name: dind
+    image: docker:24.0.7-dind
+    securityContext:
+      privileged: true
+    args: ["--host=unix:///var/run/docker.sock"]
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  volumes:
+  - name: docker-sock
+    emptyDir: {}
 """
         }
     }
