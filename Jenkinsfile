@@ -20,7 +20,7 @@ spec:
     image: docker:24.0.7-dind
     securityContext:
       privileged: true
-    args: ["--host=tcp://0.0.0.0:2375"]
+    args: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
   """
         }
     }
