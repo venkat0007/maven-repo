@@ -7,25 +7,15 @@ kind: Pod
 spec:
   containers:
   - name: docker
-    image: docker:24.0.7
-    command:
-    - cat
+    image: docker:20.10-dind
     tty: true
     securityContext:
-      privileged: true
+      privileged: true   # Required for DinD
     volumeMounts:
-    - name: docker-sock
-      mountPath: /var/run/docker.sock
-  - name: dind
-    image: docker:24.0.7-dind
-    securityContext:
-      privileged: true
-    args: ["--host=unix:///var/run/docker.sock"]
-    volumeMounts:
-    - name: docker-sock
-      mountPath: /var/run/docker.sock
+    - name: docker-graph-storage
+      mountPath: /var/lib/docker
   volumes:
-  - name: docker-sock
+  - name: docker-graph-storage
     emptyDir: {}
 """
         }
@@ -34,37 +24,16 @@ spec:
         string(name: 'tag', defaultValue: 'new', description: 'tagname')
     }
     stages {
-        stage('Clone repository') {
+        stage('Build & Push Docker Image') {
             steps {
                 container('docker') {
-                    script {
-                        def repoUrl = 'https://github.com/venkat0007/maven-repo.git'
-                        def branchName = 'main'
-                        checkout([$class: 'GitSCM',
-                                  branches: [[name: "refs/heads/${branchName}"]],
-                                  userRemoteConfigs: [[url: repoUrl]]])
-                    }
-                }
-            }
-        }
-        stage("building an image") {
-            steps {
-                container('docker') {
-                    script {
-                        sh "docker build -t backend-api:${params.tag} ."
-                    }
-                }
-            }
-        }
-        stage("pushing the image to dockerhub") {
-            steps {
-                container('docker') {
-                    script {
-                        sh """
-                            docker tag backend-api:${params.tag} venkat0007/backend-api:${params.tag}
-                            docker push venkat0007/backend-api:${params.tag}
-                        """
-                    }
+                    sh """
+                      dockerd-entrypoint.sh &   # start Docker daemon
+                      sleep 10                  # wait for daemon
+                      docker build -t backend-api:${params.tag} .
+                      docker tag backend-api:${params.tag} venkat0007/backend-api:${params.tag}
+                      docker push venkat0007/backend-api:${params.tag}
+                    """
                 }
             }
         }
