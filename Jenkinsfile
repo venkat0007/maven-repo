@@ -14,7 +14,7 @@ spec:
     securityContext:
       runAsUser: 0
   - name: docker
-    image: docker:24.0.7
+    image: docker:dind
     command:
     - cat
     tty: true
