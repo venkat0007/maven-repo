@@ -32,10 +32,10 @@ spec:
             steps {
                 container('gcloud') {
                     script {
-                        // Replace with Jenkins secret ID for your GCP service account JSON
-                        withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        // If 'gcp-sa-key' is a Secret Text credential
+                        withCredentials([string(credentialsId: 'gcp-sa-key', variable: 'GCP_KEY_JSON')]) {
+                            writeFile file: 'creds.json', text: "${GCP_KEY_JSON}"
                             sh """
-                                echo $gcp-sa-key > creds.json
                                 gcloud auth activate-service-account --key-file=creds.json
                                 gcloud config set project test-468900
                                 gcloud container clusters get-credentials cluster-1 \
@@ -46,6 +46,7 @@ spec:
                 }
             }
         }
+
 
         stage("Deploy to GKE") {
             steps {
