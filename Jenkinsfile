@@ -22,8 +22,14 @@ spec:
   """
         }
     }
+
     parameters {
-        string(name: 'tag', defaultValue: 'new', description: 'tagname')
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'stage', 'prod'],
+            description: 'Select the deployment environment'
+        )
+    }
     }
     stages {
         stage('Clone repository') {
