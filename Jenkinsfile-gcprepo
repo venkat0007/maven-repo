@@ -1,0 +1,94 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+  containers:
+  - name: docker
+    image: google/cloud-sdk:latest   # Includes gcloud + docker + kubectl
+    command: ["cat"]
+    tty: true
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+    env:
+    - name: USE_GKE_GCLOUD_AUTH_PLUGIN
+      value: "True"
+  """
+        }
+    }
+    parameters {
+        string(name: 'tag', defaultValue: 'new', description: 'tagname')
+    }
+    environment {
+        REGION = "us-central1"        // change if needed
+        REPO   = "backend"            // your GAR repo name
+        IMAGE  = "backend-api"        // image name
+        PROJECT_ID = "test-468900" // replace with your GCP project
+    }
+    stages {
+        stage('Clone repository') {
+            steps {
+                container('docker') {
+                    script {
+                        def repoUrl = 'https://github.com/venkat0007/maven-repo.git'
+                        def branchName = 'main'
+                        checkout([$class: 'GitSCM',
+                                  branches: [[name: "refs/heads/${branchName}"]],
+                                  userRemoteConfigs: [[url: repoUrl]]])
+                    }
+                }
+            }
+        }
+
+        stage('Authenticate with GCP') {
+            steps {
+                container('docker') {
+                    script {
+                        // Jenkins Secret Text credential containing service account JSON
+                        withCredentials([string(credentialsId: 'gcp-sa-key', variable: 'GCP_KEY_JSON')]) {
+                            writeFile file: 'creds.json', text: "${GCP_KEY_JSON}"
+                            sh """
+                                gcloud auth activate-service-account --key-file=creds.json
+                                gcloud config set project $PROJECT_ID
+                                gcloud auth configure-docker $REGION-docker.pkg.dev -q
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Build image") {
+            steps {
+                container('docker') {
+                    script {
+                        sh "docker build -t ${IMAGE}:${params.tag} ."
+                    }
+                }
+            }
+        }
+
+        stage("Push to GAR") {
+            steps {
+                container('docker') {
+                    script {
+                        def fullImage = "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/${IMAGE}:${params.tag}"
+                        sh """
+                            docker tag ${IMAGE}:${params.tag} ${fullImage}
+                            docker push ${fullImage}
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
