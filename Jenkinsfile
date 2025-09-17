@@ -30,7 +30,7 @@ spec:
             description: 'Select the deployment environment'
         )
     }
-    }
+
     stages {
         stage('Clone repository') {
             steps {
