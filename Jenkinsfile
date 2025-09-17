@@ -23,12 +23,8 @@ spec:
         }
     }
 
-    parameters {
-        choice(
-            name: 'ENVIRONMENT',
-            choices: ['dev', 'stage', 'prod'],
-            description: 'Select the deployment environment'
-        )
+   parameters {
+        string(name: 'tag', defaultValue: 'new', description: 'tagname')
     }
 
     stages {
