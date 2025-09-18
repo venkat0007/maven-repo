@@ -1,8 +1,6 @@
 # Use the official AdoptOpenJDK image as the base image
 FROM maven:3-openjdk-17 AS build
 
-
-
 # Set the working directory in the container
 WORKDIR /app
 
