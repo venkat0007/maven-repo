@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: venkat12/backend-api:1.0
+        image: us-central1-docker.pkg.dev/test-468900/backend/backend-api:3.0
         ports:
         - containerPort: 8080
 
