@@ -11,7 +11,7 @@ spec:
       path: /var/run/docker.sock
   containers:
   - name: docker
-    image: google/cloud-sdk:latest   # Includes gcloud + docker + kubectl
+    image: google/cloud-sdk:latest   # gcloud + kubectl
     command: ["cat"]
     tty: true
     securityContext:
@@ -29,10 +29,10 @@ spec:
         string(name: 'tag', defaultValue: 'new', description: 'tagname')
     }
     environment {
-        REGION = "us-central1"        // change if needed
-        REPO   = "backend"            // your GAR repo name
-        IMAGE  = "backend-api"        // image name
-        PROJECT_ID = "test-468900" // replace with your GCP project
+        REGION = "us-central1"
+        REPO   = "backend"
+        IMAGE  = "backend-api"
+        PROJECT_ID = "test-468900"
     }
     stages {
         stage('Clone repository') {
@@ -49,11 +49,21 @@ spec:
             }
         }
 
+        stage('Install Docker CLI') {
+            steps {
+                container('docker') {
+                    sh """
+                        apt-get update
+                        apt-get install -y docker.io
+                    """
+                }
+            }
+        }
+
         stage('Authenticate with GCP') {
             steps {
                 container('docker') {
                     script {
-                        // Jenkins Secret Text credential containing service account JSON
                         withCredentials([string(credentialsId: 'gcp-sa-key', variable: 'GCP_KEY_JSON')]) {
                             writeFile file: 'creds.json', text: "${GCP_KEY_JSON}"
                             sh """
@@ -70,9 +80,7 @@ spec:
         stage("Build image") {
             steps {
                 container('docker') {
-                    script {
-                        sh "docker build -t ${IMAGE}:${params.tag} ."
-                    }
+                    sh "docker build -t ${IMAGE}:${params.tag} ."
                 }
             }
         }
