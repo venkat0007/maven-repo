@@ -5,7 +5,6 @@ WORKDIR /app
 # Copy the Maven project files
 COPY pom.xml .
 COPY src ./src
-
 # Build the Maven project
 RUN java --version && \
     mvn clean package -DskipTests
