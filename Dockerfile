@@ -11,7 +11,6 @@ RUN java --version && \
 
 # Use the same base image for the runtime
 FROM openjdk:17
-
 # Set the working directory in the container
 WORKDIR /app
 
